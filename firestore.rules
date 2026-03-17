@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: villages
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - state: string (required, 1-50 chars)
+    //   - description: string (optional, 0-500 chars)
+    //   - created_at: string (required, ISO 8601)
+    //
+    // Collection: members
+    // Fields:
+    //   - village_id: string (required, must exist in villages)
+    //   - full_name: string (required, 1-100 chars)
+    //   - age: number (required, 0-120)
+    //   - gender: string (required, Male/Female/Other)
+    //   - phone: string (optional, 0-20 chars)
+    //   - occupation: string (optional, 0-100 chars)
+    //   - address: string (optional, 0-200 chars)
+    //   - created_at: string (required, ISO 8601)
+    //
+    // Collection: users
+    // Fields:
+    //   - email: string (required, valid email)
+    //   - role: string (required, admin/user)
+    //   - uid: string (required, matches auth.uid)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "lsamy2752@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string && dateStr.matches("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*Z?$");
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidVillage(data) {
+      return data.keys().hasAll(['name', 'state', 'created_at']) &&
+             data.keys().hasOnly(['name', 'state', 'description', 'created_at']) &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.state is string && data.state.size() >= 1 && data.state.size() <= 50 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
+             isValidDateString(data.created_at);
+    }
+
+    function isValidMember(data) {
+      return data.keys().hasAll(['village_id', 'full_name', 'age', 'gender', 'created_at']) &&
+             data.keys().hasOnly(['village_id', 'full_name', 'age', 'gender', 'phone', 'occupation', 'address', 'created_at']) &&
+             data.village_id is string &&
+             data.full_name is string && data.full_name.size() >= 1 && data.full_name.size() <= 100 &&
+             data.age is number && data.age >= 0 && data.age <= 120 &&
+             data.gender in ['Male', 'Female', 'Other'] &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 20)) &&
+             (!('occupation' in data) || (data.occupation is string && data.occupation.size() <= 100)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 200)) &&
+             isValidDateString(data.created_at);
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'role', 'uid']) &&
+             data.keys().hasOnly(['email', 'role', 'uid']) &&
+             isValidEmail(data.email) &&
+             data.role in ['admin', 'user'] &&
+             data.uid == request.auth.uid;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /villages/{villageId} {
+      allow read: if isAuthenticated();
+      allow create: if isAdmin() && isValidVillage(request.resource.data);
+      allow update: if isAdmin() && isValidVillage(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /members/{memberId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidMember(request.resource.data);
+      allow update: if isAuthenticated() && isValidMember(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    (request.resource.data.role == 'user' || isAdmin());
+      allow update: if isAuthenticated() && isValidUser(request.resource.data) && 
+                    (request.resource.data.role == resource.data.role || isAdmin());
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

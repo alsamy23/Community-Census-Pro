@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "Village": {
+      "title": "Village",
+      "description": "Represents a community or village in the census.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the village." },
+        "state": { "type": "string", "description": "The state where the village is located." },
+        "description": { "type": "string", "description": "A brief description of the village." },
+        "created_at": { "type": "string", "format": "date-time", "description": "When the village was added." }
+      },
+      "required": ["name", "state", "created_at"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "Represents an individual resident in a village.",
+      "type": "object",
+      "properties": {
+        "village_id": { "type": "string", "description": "Reference to the village ID." },
+        "full_name": { "type": "string", "description": "Full name of the member." },
+        "age": { "type": "number", "description": "Age of the member." },
+        "gender": { "type": "string", "enum": ["Male", "Female", "Other"], "description": "Gender of the member." },
+        "phone": { "type": "string", "description": "Contact phone number." },
+        "occupation": { "type": "string", "description": "Member's occupation." },
+        "address": { "type": "string", "description": "Residential address." },
+        "created_at": { "type": "string", "format": "date-time", "description": "When the member was added." }
+      },
+      "required": ["village_id", "full_name", "age", "gender", "created_at"]
+    },
+    "User": {
+      "title": "User",
+      "description": "System user with specific roles.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "description": "User's email address." },
+        "role": { "type": "string", "enum": ["admin", "user"], "description": "User's role in the system." },
+        "uid": { "type": "string", "description": "Firebase Auth UID." }
+      },
+      "required": ["email", "role", "uid"]
+    }
+  },
+  "firestore": {
+    "villages": {
+      "schema": "Village",
+      "description": "Collection of all villages."
+    },
+    "members": {
+      "schema": "Member",
+      "description": "Collection of all members across all villages."
+    },
+    "users": {
+      "schema": "User",
+      "description": "Collection of system users and their roles."
+    }
+  }
+}
