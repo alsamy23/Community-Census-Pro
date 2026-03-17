@@ -1,10 +1,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Stats } from "../types.ts";
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
-
 export async function getCommunityInsights(stats: Stats) {
   try {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+    if (!apiKey) {
+      console.warn("GEMINI_API_KEY is missing. AI insights will not be generated.");
+      return "Unable to generate insights: API key missing.";
+    }
+    
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `Analyze the following community census data and provide 3 key insights or recommendations for community development:
