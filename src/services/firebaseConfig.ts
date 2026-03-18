@@ -15,6 +15,10 @@ const firebaseConfig = {
   firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DB_ID
 };
 
+export const missingConfigKeys = Object.entries(firebaseConfig)
+  .filter(([key, value]) => !value && key !== 'measurementId')
+  .map(([key]) => key);
+
 export { firebaseConfig };
 
 // Validate config before initialization

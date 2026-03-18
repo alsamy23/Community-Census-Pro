@@ -30,6 +30,7 @@ import Login from './components/Login';
 import FirestoreError from './components/FirestoreError';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { dataService } from './services/dataService';
+import { missingConfigKeys } from './services/firebaseConfig';
 import { firebaseConfig } from './services/firebaseConfig';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -154,14 +155,22 @@ function TopBar() {
         </div>
         
         <div className={cn(
-          "flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+          "flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all",
           isConnected 
-            ? "bg-emerald-50 text-emerald-600 border border-emerald-100" 
-            : "bg-amber-50 text-amber-600 border border-amber-100"
+            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm shadow-emerald-100/50" 
+            : "bg-amber-50 text-amber-600 border border-amber-100 shadow-sm shadow-amber-100/50"
         )}>
-          {isConnected ? <Cloud size={12} /> : <CloudOff size={12} />}
+          {isConnected ? <Cloud size={14} /> : <AlertCircle size={14} />}
           <span>{isConnected ? 'Cloud Connected' : 'Local Demo Mode'}</span>
-          {isConnected && <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>}
+          {isConnected ? (
+            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+          ) : (
+            missingConfigKeys.length > 0 && (
+              <span className="ml-1 text-[9px] lowercase font-medium opacity-80 decoration-dotted underline cursor-help" title={`Missing: ${missingConfigKeys.join(', ')}`}>
+                ({missingConfigKeys.length} keys missing)
+              </span>
+            )
+          )}
         </div>
       </div>
       
