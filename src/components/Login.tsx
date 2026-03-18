@@ -31,10 +31,9 @@ export default function Login() {
       await login(email, 'user');
     } else {
       // Admin login logic
-      const isAdmin1 = email === 'admin@census.com' && password === 'admin123';
-      const isAdmin2 = email === 'lsamy2752@gmail.com' && password === 'admin@123';
+      const isAdmin = email === 'lsamy2752@gmail.com' && password === 'admin@123';
       
-      if (isAdmin1 || isAdmin2) {
+      if (isAdmin) {
         await login(email, 'admin');
       } else {
         setError('Invalid admin credentials');
@@ -49,7 +48,6 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-100"
       >
-        {/* ... existing header ... */}
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center text-brand-600">
             <Users size={32} />
@@ -90,7 +88,6 @@ export default function Login() {
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* ... existing form fields ... */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">
               {mode === 'admin' ? 'Admin Email' : 'Email Address'}
@@ -152,13 +149,6 @@ export default function Login() {
               Try Demo Mode (Local Storage)
             </button>
           </div>
-
-          {mode === 'admin' && (
-            <div className="mt-4 bg-slate-50 p-2 rounded-lg border border-slate-100 text-center text-[10px]">
-              <p className="font-bold text-slate-900">Demo Admin Credentials</p>
-              <p className="text-slate-500">Email: admin@census.com | Pass: admin123</p>
-            </div>
-          )}
         </div>
       </motion.div>
     </div>
