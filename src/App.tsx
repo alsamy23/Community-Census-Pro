@@ -166,8 +166,11 @@ function TopBar() {
             <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
           ) : (
             missingConfigKeys.length > 0 && (
-              <span className="ml-1 text-[9px] lowercase font-medium opacity-80 decoration-dotted underline cursor-help" title={`Missing: ${missingConfigKeys.join(', ')}`}>
-                ({missingConfigKeys.length} keys missing)
+              <span 
+                className="ml-1 text-[9px] lowercase font-medium opacity-80 decoration-dotted underline cursor-help" 
+                title={`Missing keys: ${missingConfigKeys.join(', ')}. IMPORTANT: You must trigger a NEW DEPLOYMENT in Vercel after adding variables!`}
+              >
+                ({missingConfigKeys.length} keys missing - redeploy needed)
               </span>
             )
           )}
