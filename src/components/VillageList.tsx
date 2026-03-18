@@ -71,15 +71,13 @@ export default function VillageList() {
           <h1 className="text-2xl font-bold text-slate-900">Villages</h1>
           <p className="text-slate-500">Manage community villages and their populations.</p>
         </div>
-        {role === 'admin' && (
-          <button 
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm"
-          >
-            <Plus size={20} />
-            <span>Add Village</span>
-          </button>
-        )}
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-sm"
+        >
+          <Plus size={20} />
+          <span>Add Village</span>
+        </button>
       </div>
 
       {/* State Filter */}
@@ -117,14 +115,12 @@ export default function VillageList() {
               <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600">
                 <MapPin size={24} />
               </div>
-              {role === 'admin' && (
-                <button 
-                  onClick={() => handleDelete(village.id)}
-                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <Trash2 size={18} />
-                </button>
-              )}
+              <button 
+                onClick={() => handleDelete(village.id)}
+                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+              >
+                <Trash2 size={18} />
+              </button>
             </div>
             
             <div className="flex items-center gap-2 mb-1">

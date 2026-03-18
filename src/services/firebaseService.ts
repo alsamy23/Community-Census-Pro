@@ -220,5 +220,27 @@ export const firebaseService = {
       handleFirestoreError(error, OperationType.GET, 'stats');
       return { totalPopulation: 0, villageCounts: [], genderStats: [], ageStats: [] };
     }
+  },
+
+  async getAllDataForBackup(): Promise<any> {
+    try {
+      if (!db) throw new Error("Database not initialized");
+      const [vSnap, mSnap] = await Promise.all([
+        getDocs(collection(db, 'villages')),
+        getDocs(collection(db, 'members'))
+      ]);
+
+      const villages = vSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const members = mSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      return {
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+        villages,
+        members
+      };
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, 'backup');
+    }
   }
 };

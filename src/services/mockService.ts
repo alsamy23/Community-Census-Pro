@@ -114,5 +114,17 @@ export const mockService = {
     ];
 
     return { totalPopulation, villageCounts, genderStats, ageStats };
+  },
+
+  async getAllDataForBackup(): Promise<any> {
+    const villages = getStored(STORAGE_KEY_VILLAGES, initialVillages);
+    const members = getStored(STORAGE_KEY_MEMBERS, initialMembers);
+
+    return {
+      exportDate: new Date().toISOString(),
+      version: "1.0 (Mock)",
+      villages,
+      members
+    };
   }
 };

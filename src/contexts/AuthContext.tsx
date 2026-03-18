@@ -61,7 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (userEmail: string, forcedRole?: Role) => {
-    const newRole: Role = forcedRole || (userEmail.toLowerCase().includes('admin') ? 'admin' : 'user');
+    const isExplicitAdmin = userEmail.toLowerCase().includes('admin') || userEmail === 'lsamy2752@gmail.com';
+    const newRole: Role = forcedRole || (isExplicitAdmin ? 'admin' : 'user');
     
     // Sync to Firestore if authenticated
     if (auth?.currentUser && db) {

@@ -17,7 +17,9 @@ import {
   LogOut,
   AlertCircle,
   Cloud,
-  CloudOff
+  CloudOff,
+  Database,
+  Download
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import Dashboard from './components/Dashboard';
@@ -46,6 +48,21 @@ function Sidebar() {
     { icon: Users, label: 'All Members', path: '/members' },
     ...(role === 'admin' ? [{ icon: MessageSquare, label: 'Messaging', path: '/messaging' }] : []),
   ];
+
+  const handleBackup = async () => {
+    try {
+      const data = await dataService.getAllDataForBackup();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `census_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert("Backup failed: " + err.message);
+    }
+  };
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200 h-screen sticky top-0 hidden md:flex flex-col">
@@ -96,6 +113,17 @@ function Sidebar() {
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
             {role === 'admin' ? 'Admin Panel' : 'User Panel'}
           </p>
+          
+          {role === 'admin' && (
+            <button 
+              onClick={handleBackup}
+              className="flex items-center gap-2 text-sm text-slate-700 hover:text-brand-600 transition-colors w-full mb-3"
+            >
+              <Database size={16} />
+              <span>Full Backup (JSON)</span>
+            </button>
+          )}
+
           <button 
             onClick={logout}
             className="flex items-center gap-2 text-sm text-slate-700 hover:text-red-600 transition-colors w-full"

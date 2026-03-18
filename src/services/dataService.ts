@@ -117,5 +117,15 @@ export const dataService = {
       if (handleFirebaseError(err)) return mockService.getStats();
       throw err;
     }
+  },
+
+  async getAllDataForBackup(): Promise<any> {
+    if (this.isDemo) return mockService.getAllDataForBackup();
+    try {
+      return await firebaseService.getAllDataForBackup();
+    } catch (err) {
+      if (handleFirebaseError(err)) return mockService.getAllDataForBackup();
+      throw err;
+    }
   }
 };

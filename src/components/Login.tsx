@@ -31,7 +31,10 @@ export default function Login() {
       await login(email, 'user');
     } else {
       // Admin login logic
-      if (email === 'admin@census.com' && password === 'admin123') {
+      const isAdmin1 = email === 'admin@census.com' && password === 'admin123';
+      const isAdmin2 = email === 'lsamy2752@gmail.com' && password === 'admin@123';
+      
+      if (isAdmin1 || isAdmin2) {
         await login(email, 'admin');
       } else {
         setError('Invalid admin credentials');

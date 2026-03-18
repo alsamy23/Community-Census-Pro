@@ -15,7 +15,9 @@ import {
   Search,
   Download,
   PieChart as PieChartIcon,
-  BarChart as BarChartIcon
+  BarChart as BarChartIcon,
+  MessageSquare,
+  MessageCircle
 } from 'lucide-react';
 import { Village, Member } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
@@ -115,6 +117,34 @@ export default function VillageDetail() {
 
   const COLORS = ['#4f46e5', '#ec4899', '#10b981', '#f59e0b'];
 
+  const handleMessage = (phone: string, name?: string) => {
+    if (!phone) {
+      alert("No phone number available for this member.");
+      return;
+    }
+    // Format phone number (remove non-digits)
+    const formattedPhone = phone.replace(/\D/g, '');
+    const message = name ? `Hello ${name}, this is from CensusPro.` : 'Hello, this is from CensusPro.';
+    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleMessageAll = () => {
+    const phones = members.map(m => m.phone).filter(p => !!p);
+    if (phones.length === 0) {
+      alert("No members have phone numbers in this village.");
+      return;
+    }
+    
+    // In a real app, this might open a bulk messaging portal.
+    // For now, we'll inform the user and maybe provide a copy-list.
+    const phoneList = phones.join(', ');
+    if (confirm(`Messaging ${phones.length} members. (Note: Multi-recipient WhatsApp requires a business API). \n\nRecipients: ${phoneList}\n\nDo you want to copy the numbers to clipboard?`)) {
+      navigator.clipboard.writeText(phoneList);
+      alert("Phone numbers copied to clipboard.");
+    }
+  };
+
   const downloadCSV = () => {
     const headers = ['Full Name', 'Age', 'Gender', 'Phone', 'Occupation', 'Address'];
     const rows = members.map(m => [
@@ -171,7 +201,14 @@ export default function VillageDetail() {
               </div>
             </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <button 
+              onClick={handleMessageAll}
+              className="flex items-center justify-center gap-2 border border-brand-200 text-brand-600 px-6 py-3 rounded-2xl font-bold transition-all hover:bg-brand-50"
+            >
+              <MessageSquare size={20} />
+              <span>Message All</span>
+            </button>
             <button 
               onClick={downloadCSV}
               className="flex items-center justify-center gap-2 border border-slate-200 text-slate-600 px-6 py-3 rounded-2xl font-bold transition-all hover:bg-slate-50"
@@ -251,14 +288,21 @@ export default function VillageDetail() {
                   <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600">
                     <User size={20} />
                   </div>
-                  {role === 'admin' && (
+                  <div className="flex items-center gap-1">
                     <button 
-                      onClick={() => handleDeleteMember(member.id)}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                      onClick={() => handleMessage(member.phone, member.full_name)}
+                      className="p-2 text-brand-600 hover:bg-brand-50 rounded-lg transition-all"
+                      title="Send WhatsApp Message"
                     >
-                      <Trash2 size={16} />
+                      <MessageCircle size={18} />
                     </button>
-                  )}
+                      <button 
+                        onClick={() => handleDeleteMember(member.id)}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                  </div>
                 </div>
                 
                 <h3 className="text-lg font-bold text-slate-900">{member.full_name}</h3>
